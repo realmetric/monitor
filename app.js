@@ -5,7 +5,9 @@ var login = url.get('login');
 var password = url.get('pass');
 
 
-request('metrics', data => showMetrics(data['metrics'][group]));
+setInterval(function () {
+    request('metrics', data => showMetrics(data['metrics'][group]));
+}, 5000)
 
 
 function showMetrics(metrics) {
@@ -21,7 +23,7 @@ function showMetrics(metrics) {
 }
 
 function prepareData(keyVal) {
-    let step = 30;
+    let step = 10;
     let max = 24 * 60 / step;
 
 
@@ -65,7 +67,9 @@ window.chart = function (container, title, curr, prev) {
     let ch = window.Highcharts.chart(container, {
         chart: {
             type: 'column',
-            margin: [-1, -5, 21, 0],
+            spacing: 0,
+            animation: false,
+            marginRight: -50,
             zoomType: 'xy'
         },
         title: {
@@ -75,10 +79,11 @@ window.chart = function (container, title, curr, prev) {
             crosshair: true,
             type: 'datetime',
             tickLength: 4,
-            startOnTick: true,
             minPadding: 0,
-            endOnTick: true,
             maxPadding: 0,
+            opposite: true,
+            startOnTick: true,
+            endOnTick: true,
             labels: {
                 enabled: false
             },
@@ -92,6 +97,9 @@ window.chart = function (container, title, curr, prev) {
             title: null,
             startOnTick: false,
             endOnTick: false,
+            opposite: true,
+            minPadding: 0,
+            maxPadding: 0,
             labels: {
                 enabled: false
             }
@@ -103,14 +111,17 @@ window.chart = function (container, title, curr, prev) {
             column: {
                 grouping: false,
                 pointPadding: 0,
-                groupPadding: 0
+                groupPadding: 0,
+                animation: false
             },
-            stickyTracking: false
+            stickyTracking: false,
         },
         series: [
             {data: prev},
             {data: curr},
-        ]
-    })
+        ],
 
+    });
+
+    ch.yAxis[0].setExtremes(0, max);
 }
