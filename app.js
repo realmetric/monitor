@@ -11,18 +11,17 @@ request('metrics', data => showMetrics(data['metrics'][group]));
 function showMetrics(metrics) {
     var count = metrics.length;
 
-    metrics.forEach(item => {
+    metrics.forEach((item, id) => {
         request('values/minutes?metric_id=' + item.id, data => {
-            console.log(item.name);
-            console.log(data.values);
-
-            chart(data.values.curr['2018-04-24'], data.values.prev['2018-04-23']);
+            let curr = data.values.curr[Object.keys(data.values.curr)[0]];
+            let prev = data.values.prev[Object.keys(data.values.prev)[0]];
+            chart('container' + id, item.name, curr, prev);
         });
     })
 }
 
 function prepareData(keyVal) {
-    let step = 10;
+    let step = 30;
     let max = 24 * 60 / step;
 
 
@@ -59,17 +58,19 @@ function request(path, callback, httpMethod = 'GET') {
 }
 
 
-window.chart = function (curr, prev) {
+window.chart = function (container, title, curr, prev) {
     curr = prepareData(curr);
     prev = prepareData(prev);
 
-    let ch = window.Highcharts.chart('container', {
+    let ch = window.Highcharts.chart(container, {
         chart: {
             type: 'column',
             margin: [-1, -5, 21, 0],
             zoomType: 'xy'
         },
-        title: null,
+        title: {
+            text: title
+        },
         xAxis: {
             crosshair: true,
             type: 'datetime',
@@ -78,6 +79,9 @@ window.chart = function (curr, prev) {
             minPadding: 0,
             endOnTick: true,
             maxPadding: 0,
+            labels: {
+                enabled: false
+            },
             plotLines: [{
                 value: new Date().getTime() - new Date().getTimezoneOffset() * 60 * 1000
             }]
