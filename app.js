@@ -5,6 +5,7 @@ var login = url.get('login');
 var password = url.get('pass');
 
 
+request('metrics', data => showMetrics(data['metrics'][group]));
 setInterval(function () {
     request('metrics', data => showMetrics(data['metrics'][group]));
 }, 5000)
@@ -13,11 +14,14 @@ setInterval(function () {
 function showMetrics(metrics) {
     var count = metrics.length;
 
+
     metrics.forEach((item, id) => {
+        let name = item.name.substr(group.length + 1);
+
         request('values/minutes?metric_id=' + item.id, data => {
             let curr = data.values.curr[Object.keys(data.values.curr)[0]];
             let prev = data.values.prev[Object.keys(data.values.prev)[0]];
-            chart('container' + id, item.name, curr, prev);
+            chart('container' + id, name, curr, prev);
         });
     })
 }
@@ -68,19 +72,28 @@ window.chart = function (container, title, curr, prev) {
         chart: {
             type: 'column',
             spacing: 0,
+            backgroundColor: '#111',
             animation: false,
             marginRight: -50,
             zoomType: 'xy'
         },
         title: {
-            text: title
+            text: title,
+            style: {
+                color: 'rgba(255,255,255,0.7)'
+            }
         },
         xAxis: {
             crosshair: true,
             type: 'datetime',
             tickLength: 4,
             minPadding: 0,
+            minorTickLength: 0,
+            tickLength: 0,
             maxPadding: 0,
+            lineWidth: 0,
+            minorGridLineWidth: 0,
+            lineColor: 'transparent',
             opposite: true,
             startOnTick: true,
             endOnTick: true,
@@ -96,6 +109,7 @@ window.chart = function (container, title, curr, prev) {
             min: 0,
             title: null,
             startOnTick: false,
+            gridLineWidth: 0,
             endOnTick: false,
             opposite: true,
             minPadding: 0,

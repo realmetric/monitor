@@ -1,9 +1,27 @@
+* {    box-sizing: border-box;}
+
 html,body {
     height: 100%;
+    background: #111;
 }
 
 .container {
+    padding-top: 20px;
     width: 33%;
     float: left;
     height:33%;
+}
+
+
+
+.highcharts-color-0 {
+    fill: rgba(255,255,255,0.3)
+}
+
+.highcharts-color-1 {
+    fill: rgba(255,255,255,0.7)
+}
+
+.highcharts-column-series rect.highcharts-point {
+    stroke: none !important;
 }
