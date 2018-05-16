@@ -3,6 +3,11 @@ var group = url.get('group');
 var api = 'https://' + url.get('api') + '/';
 var login = url.get('login');
 var password = url.get('pass');
+var step = url.get('step');
+
+if (!step) {
+	step = 10;
+}
 
 
 request('metrics', data => showMetrics(data['metrics'][group]));
@@ -27,7 +32,6 @@ function showMetrics(metrics) {
 }
 
 function prepareData(keyVal) {
-    let step = 10;
     let max = 24 * 60 / step;
 
 
