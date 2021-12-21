@@ -19,21 +19,23 @@ setInterval(function () {
 function showMetrics(metrics) {
     var count = metrics.length;
 
-
     metrics.forEach((item, id) => {
         let name = item.name.substr(group.length + 1);
 
         request('values/minutes?metric_id=' + item.id, data => {
-            let curr = data.values.curr[Object.keys(data.values.curr)[0]];
-            let prev = data.values.prev[Object.keys(data.values.prev)[0]];
-            chart('container' + id, name, curr, prev);
+            const {curr, prev} = data.values;
+            const resCurrKey = Object.keys(curr)[0];
+            const resPrevKey = Object.keys(prev)[0];
+            const currData = curr[resCurrKey].map(value => +value);
+            const prevData = prev[resPrevKey].map(value => +value);
+
+            chart('container' + id, name, currData, prevData);
         });
     })
 }
 
 function prepareData(keyVal) {
     let max = 24 * 60 / step;
-
 
     let result = [];
     let pointer = 0;
@@ -73,19 +75,18 @@ window.chart = function (container, title, curr, prev) {
     prev = prepareData(prev);
 
     let ch = window.Highcharts.chart(container, {
+        credits: {
+            enabled: false
+        },
         chart: {
             type: 'column',
             spacing: 0,
-            backgroundColor: '#111',
             animation: false,
             marginRight: -50,
             zoomType: 'xy'
         },
         title: {
             text: title,
-            style: {
-                color: 'rgba(255,255,255,0.7)'
-            }
         },
         xAxis: {
             crosshair: true,
@@ -125,21 +126,27 @@ window.chart = function (container, title, curr, prev) {
         legend: {
             enabled: false
         },
+        tooltip: {
+            animation: false,
+            shared: true,
+            useHTML: true,
+            shadow: false
+        },
         plotOptions: {
             column: {
                 grouping: false,
                 pointPadding: 0,
                 groupPadding: 0,
-                animation: false
+                animation: false,
             },
             stickyTracking: false,
         },
         series: [
-            {data: prev},
-            {data: curr},
+            {data: prev, name: 'yesterday', color: 'rgba(154, 162, 172, 0.45)'},
+            {data: curr, name: 'today', color: 'rgba(0, 79, 168, 0.43)'},
         ],
 
     });
 
-    ch.yAxis[0].setExtremes(0, max);
+    // ch.yAxis[0].setExtremes(0);
 }
